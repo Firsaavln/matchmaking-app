@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import Navbar from '@/components/dashboard/Navbar';
 import StartupCard from '@/components/dashboard/StartupCard';
 import { KOTA_INDONESIA, COMPANY_TYPES, BUSINESS_CATEGORIES } from '@/constants';
+import { title } from 'process';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -33,6 +34,7 @@ export default function Dashboard() {
     startup_name: '',
     founder_name: '',
     tagline: '',
+    title: '',
     social_link: '',
     founding_year: new Date().getFullYear().toString(),
     business_category: '',
@@ -146,7 +148,7 @@ export default function Dashboard() {
       fetchIdeas(userId, role);
       // Reset form & files
       setFormData({ 
-        startup_name: '', founder_name: '', tagline: '', social_link: '', 
+        startup_name: '', founder_name: '', title: '', tagline: '', social_link: '', 
         founding_year: new Date().getFullYear().toString(), business_category: '', 
         company_type: 'PT', location: '', phone_number: '', core_advantages: '', 
         target_market: '', key_metrics: '', event_goals: '', description: '' 
@@ -211,6 +213,7 @@ export default function Dashboard() {
                   <label className="text-[15px] font-black uppercase text-slate-900 border-b pb-2 block">Identity</label>
                   <input required placeholder="Startup Name" className="w-full border-b border-slate-100 py-2 text-sm font-bold focus:border-slate-900 outline-none" value={formData.startup_name} onChange={e => setFormData({...formData, startup_name: e.target.value})} />
                   <input required placeholder="Founder Name" className="w-full border-b border-slate-100 py-2 text-sm font-bold focus:border-slate-900 outline-none" value={formData.founder_name} onChange={e => setFormData({...formData, founder_name: e.target.value})} />
+                  <input required placeholder="Title Idea" className="w-full border-b border-slate-100 py-2 text-sm font-bold focus:border-slate-900 outline-none" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} />
                   <input required placeholder="Tagline" className="w-full border-b border-slate-100 py-2 text-sm font-bold focus:border-slate-900 outline-none" value={formData.tagline} onChange={e => setFormData({...formData, tagline: e.target.value})} />
                   <input placeholder="Website (https://...)" className="w-full border-b border-slate-100 py-2 text-sm font-bold focus:border-slate-900 outline-none text-indigo-600" value={formData.social_link} onChange={e => setFormData({...formData, social_link: e.target.value})} />
                   <select className="w-full border-b border-slate-100 py-2 text-sm font-bold outline-none" value={formData.founding_year} onChange={e => setFormData({...formData, founding_year: e.target.value})}>
