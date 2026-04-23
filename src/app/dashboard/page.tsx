@@ -14,6 +14,7 @@ import MatchesTab from '@/components/dashboard/MatchesTab';
 import IdeaForm from '@/components/dashboard/IdeaForm';
 import DetailModal from '@/components/modals/DetailModal';
 import ScheduleModal from '@/components/modals/ScheduleModal';
+import Footer from '@/components/dashboard/Footer';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -131,10 +132,12 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FDFDFD]">
+    // Penambahan class flex dan flex-col di sini
+    <div className="min-h-screen bg-[#FDFDFD] flex flex-col">
       <Navbar email={uInfo.email} />
       
-      <main className="max-w-6xl mx-auto px-6 py-12">
+      {/* Penambahan class w-full dan flex-grow di sini */}
+      <main className="max-w-6xl mx-auto w-full px-6 py-12 flex-grow">
         <header className="flex justify-between items-end mb-12">
           <div>
             <h1 className="text-3xl font-black uppercase tracking-tighter text-slate-900 leading-none">Dashboard Control</h1>
@@ -205,6 +208,9 @@ export default function DashboardPage() {
           )}
         </div>
       </main>
+
+      {/* PANGGIL FOOTER DI SINI */}
+      <Footer />
 
       {/* ================= MODALS ================= */}
       {selectedIdea && !showScheduleModal && (

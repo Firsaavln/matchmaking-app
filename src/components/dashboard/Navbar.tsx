@@ -23,7 +23,12 @@ export default function Navbar({ email }: { email: string }) {
     <nav className="border-b border-slate-100 bg-white/80 backdrop-blur-md sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-6 h-20 flex justify-between items-center">
         <div className="flex items-center gap-8">
-          <span className="text-lg font-black tracking-tighter uppercase italic">MatchVenture.</span>
+          <span className="text-xl
+           font-black tracking-tighter uppercase italic">
+            
+            SIAP BISNIS FORUM
+
+          </span>
         </div>
 
         <div className="flex items-center gap-6">

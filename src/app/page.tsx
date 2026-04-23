@@ -68,10 +68,12 @@ export default function AuthPage() {
         {/* LOGO SECTION */}
         <div className="text-center mb-12">
           <h1 className="text-2xl font-black tracking-tighter uppercase italic text-slate-900">
-            MatchVenture<span className="text-indigo-600">.</span>
+            SIAP BISNIS FORUM
+            
+            <span className="text-indigo-600">.</span>
           </h1>
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] mt-2">
-            The Investment Gateway
+            BUSINESS MATCHING & DATING
           </p>
         </div>
 
@@ -105,7 +107,7 @@ export default function AuthPage() {
                     onClick={() => setRole('founder')}
                     className={`py-3 px-2 rounded-xl border text-[10px] font-bold transition-all ${role === 'founder' ? 'border-slate-900 bg-slate-900 text-white shadow-lg shadow-slate-200' : 'border-slate-100 text-slate-400 bg-slate-50'}`}
                   >
-                    FOUNDER
+                    STARTUP
                   </button>
                   <button 
                     type="button"
@@ -158,7 +160,11 @@ export default function AuthPage() {
 
         <p className="text-center mt-10 text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-loose">
           Security Protocol Enabled <br/>
-          <span className="text-slate-300 font-medium">© 2026 MatchVenture Lab. All Rights Reserved.</span>
+          <span className="text-slate-300 font-medium">
+            
+            © 2026 Powered by EKRAF & PT. PANCA CENTRAL ABADI
+
+          </span>
         </p>
       </div>
     </div>
