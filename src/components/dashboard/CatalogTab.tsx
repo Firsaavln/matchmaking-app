@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import StartupCard from './StartupCard';
 import { KOTA_INDONESIA, BUSINESS_CATEGORIES } from '@/constants';
+import { Handshake } from 'lucide-react';
 
 // 1. TAMBAHKAN onMatchRequest ke dalam Interface Props
 interface CatalogProps {
@@ -98,16 +99,40 @@ export default function CatalogTab({
             
             {/* TOMBOL REQUEST MATCH KHUSUS INVESTOR */}
             {uInfo.role?.toLowerCase() === 'investor' && (
-              <button 
-                onClick={(e) => {
-                  e.stopPropagation(); // Mencegah detail modal ikut terbuka
-                  onMatchRequest(idea); // <--- SEKARANG PAKE FUNGSI DARI PAGE.TSX
-                }} 
-                className="absolute top-6 right-6 z-10 bg-indigo-600 text-white text-[9px] font-black uppercase px-6 py-4 rounded-full opacity-0 group-hover:opacity-100 transition-all shadow-xl hover:scale-105 active:scale-95"
-              >
-                Request Match
-              </button>
-            )}
+  <button 
+    onClick={(e) => {
+      e.stopPropagation();
+      onMatchRequest(idea);
+    }} 
+    className="
+      /* Posisi: sedikit lebih rapat ke sudut di mobile agar manis */
+      absolute top-4 right-4 z-20 
+      
+      /* Style: Indigo solid dengan efek shadow halus */
+      bg-indigo-600 text-white shadow-xl shadow-indigo-200/50
+      
+      /* Shape: Di mobile kotak membulat (modern), di desktop pill */
+      p-3 md:px-5 md:py-3 rounded-2xl md:rounded-full
+      
+      /* Flex: Biar icon dan teks sejajar */
+      flex items-center justify-center gap-2
+      
+      /* Visibility Logic: Muncul di mobile, hover di desktop */
+      opacity-100 md:opacity-0 md:group-hover:opacity-100 
+      
+      /* Animasi & Interaction */
+      transition-all duration-300 hover:bg-indigo-700 active:scale-90
+    "
+  >
+    {/* Icon: Gunakan icon Handshake agar minimalis */}
+    <Handshake size={16} className="shrink-0" />
+    
+    {/* Teks: Sembunyikan di mobile agar hanya icon yang kelihatan (Minimalist) */}
+    <span className="hidden md:inline text-[9px] font-black uppercase tracking-widest">
+      Match
+    </span>
+  </button>
+)}
           </div>
         ))}
       </div>
