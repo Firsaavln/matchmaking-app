@@ -9,7 +9,7 @@ export default function UserModal({ user, onClose, onSuccess }: any) {
   const isEdit = !!user;
   const [formData, setFormData] = useState({
     email: '',
-    password: 'qwerty@098', // Set default password biar admin gak repot
+    password: '', // Set default password biar admin gak repot
     role: 'founder'
   });
   const [loading, setLoading] = useState(false);
