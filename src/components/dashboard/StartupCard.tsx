@@ -12,13 +12,13 @@ export default function StartupCard({ idea, role, onEdit, onDelete, onViewDetail
       <div className="flex items-start gap-6 mb-5">
         <img src={idea.logo_url || 'https://via.placeholder.com/150'} alt="Logo" className="w-16 h-16 rounded-2xl object-cover ring-4 ring-slate-50 flex-shrink-0" />
         <div>
-          <span className="text-[9px] font-black uppercase bg-slate-50 text-slate-400 px-3 py-1 rounded-full">{idea.business_category}</span>
+          <span className="text-[11px] font-black uppercase bg-slate-50 text-slate-400 px-3 py-1 rounded-full">{idea.business_category}</span>
           <h3 className="text-xl font-black uppercase tracking-tighter text-slate-900 mt-2 leading-tight">{idea.startup_name}</h3>
           
           {/* Link Website */}
           {idea.social_link && (
             <a href={idea.social_link.startsWith('http') ? idea.social_link : `https://${idea.social_link}`} target="_blank" rel="noopener noreferrer" className="text-[9px] font-bold text-indigo-500 hover:text-indigo-700 flex items-center gap-1 mt-2 uppercase tracking-widest transition-colors w-fit">
-              <Globe size={10} /> Visit Web
+              <Globe size={14} /> Visit Web
             </a>
           )}
         </div>
@@ -26,14 +26,14 @@ export default function StartupCard({ idea, role, onEdit, onDelete, onViewDetail
       
       {/* Metadata Badges: City, Year, Entity */}
       <div className="flex flex-wrap gap-2 mb-6">
-        <span className="text-[9px] font-black uppercase border border-slate-100 text-slate-400 px-2 py-1 rounded-md">{idea.location}</span>
-        <span className="text-[9px] font-black uppercase border border-slate-100 text-slate-400 px-2 py-1 rounded-md">{idea.founding_year}</span>
-        <span className="text-[9px] font-black uppercase border border-slate-100 text-slate-400 px-2 py-1 rounded-md">{idea.company_type}</span>
+        <span className="text-[11px] font-black uppercase border border-slate-100 text-slate-400 px-2 py-1 rounded-md">{idea.location}</span>
+        <span className="text-[11px] font-black uppercase border border-slate-100 text-slate-400 px-2 py-1 rounded-md">{idea.founding_year}</span>
+        <span className="text-[11px] font-black uppercase border border-slate-100 text-slate-400 px-2 py-1 rounded-md">{idea.company_type}</span>
       </div>
 
       {/* Tagline & Short Description (150 chars) */}
       <div className="flex-grow mb-8 space-y-3">
-        <p className="text-[11px] font-black text-slate-900 uppercase tracking-widest">{idea.tagline}</p>
+        <p className="text-[14px] font-black text-slate-900 uppercase tracking-widest">{idea.tagline}</p>
         <p className="text-xs font-medium text-slate-500 leading-relaxed italic">"{shortDesc}"</p>
       </div>
       
