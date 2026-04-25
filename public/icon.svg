@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120" title="SIAP Bisnis Forum Energic Icon">
+  <defs>
+    <linearGradient id="lime_gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#CCFF00; stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#AFFF00; stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="cyan_gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00FFFF; stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00CCCC; stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <path d="M 40 40 Q 30 50 40 60 L 50 70 Q 60 80 50 90 L 40 80 Q 30 70 40 60 Z" fill="url(#lime_gradient)" />
+  
+  <path d="M 80 40 Q 90 50 80 60 L 70 70 Q 60 80 70 90 L 80 80 Q 90 70 80 60 Z" fill="url(#cyan_gradient)" />
+</svg>

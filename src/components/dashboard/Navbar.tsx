@@ -3,6 +3,7 @@
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import Image from 'next/image'; // 1. Tambah import Image
 
 export default function Navbar({ email }: { email: string }) {
   const router = useRouter();
@@ -14,7 +15,6 @@ export default function Navbar({ email }: { email: string }) {
       toast.error('Gagal logout: ' + error.message);
     } else {
       toast.success('Berhasil keluar!');
-      // INI KUNCINYA: Paksa browser pindah ke halaman login/utama
       router.replace('/'); 
     }
   };
@@ -22,12 +22,17 @@ export default function Navbar({ email }: { email: string }) {
   return (
     <nav className="border-b border-slate-100 bg-white/80 backdrop-blur-md sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-6 h-20 flex justify-between items-center">
-        <div className="flex items-center gap-8">
-          <span className="text-xl
-           font-black tracking-tighter uppercase italic">
-            
+        {/* LOGO & BRAND SECTION */}
+        <div className="flex items-center gap-3"> {/* 2. Tambah gap biar logo & teks nggak nempel */}
+          <Image 
+            src="/icon.svg" // 3. Pastikan nama file di folder public/ beneran ini ya!
+            alt="Logo SIAP Bisnis"
+            width={60} 
+            height={60}
+            className="object-contain"
+          />
+          <span className="text-xl font-black tracking-tighter uppercase italic">
             SIAP BISNIS FORUM
-
           </span>
         </div>
 
