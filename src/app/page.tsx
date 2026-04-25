@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import Image from 'next/image'; // 1. Tambah import Image
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -65,11 +66,21 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#F9FAFB] p-6 selection:bg-slate-900 selection:text-white">
       <div className="max-w-[400px] w-full">
-        {/* LOGO SECTION */}
-        <div className="text-center mb-12">
+        
+        {/* LOGO SECTION - DENGAN IKON BARU */}
+        <div className="text-center mb-12 flex flex-col items-center">
+          <div className="mb-4 bg-white p-4 rounded-[24px] shadow-sm border border-slate-100">
+            <Image 
+              src="/icon.svg" // Pastikan file ini ada di folder public/
+              alt="Logo SIAP Bisnis"
+              width={60} 
+              height={60}
+              priority
+              className="object-contain"
+            />
+          </div>
           <h1 className="text-2xl font-black tracking-tighter uppercase italic text-slate-900">
             SIAP BISNIS FORUM
-            
             <span className="text-indigo-600">.</span>
           </h1>
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] mt-2">
@@ -161,9 +172,7 @@ export default function AuthPage() {
         <p className="text-center mt-10 text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-loose">
           Security Protocol Enabled <br/>
           <span className="text-slate-300 font-medium">
-            
             © 2026 Powered by EKRAF & PT. PANCA CENTRAL ABADI
-
           </span>
         </p>
       </div>
