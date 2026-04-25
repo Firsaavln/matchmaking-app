@@ -17,26 +17,20 @@ export default function MatchesTab({
   matches, 
   uInfo, 
   onReschedule, 
-  refreshData 
+  refreshData,
+  onUpdateStatus // <--- TAMBAHKAN PROPS INI (Hasil sinkronisasi page.tsx)
 }: { 
   matches: any[], 
   uInfo: any, 
   onReschedule: (match: any) => void, 
-  refreshData: () => void 
+  refreshData: () => void,
+  onUpdateStatus: (id: string, status: string, data: any) => void // <--- DEFINISIKAN DISINI
 }) {
   
-  // FUNGSI KONFIRMASI DEAL (Langkah Terakhir)
-  const handleFinalAccept = async (matchId: string) => {
+  // FUNGSI KONFIRMASI DEAL (Langkah Terakhir + Notifikasi Email)
+  const handleFinalAccept = async (matchId: string, fullMatchData: any) => {
     try {
-      // 1. Update status di tabel matches jadi accepted
-      const { error: matchError } = await supabase
-        .from('matches')
-        .update({ status: 'accepted' })
-        .eq('id', matchId);
-      
-      if (matchError) throw matchError;
-
-      // 2. Tandai jadwal sebagai terkonfirmasi
+      // 1. Tandai jadwal sebagai terkonfirmasi di tabel match_schedules (Fitur Lama Tetap Ada)
       const { error: scheduleError } = await supabase
         .from('match_schedules')
         .update({ is_confirmed: true })
@@ -44,14 +38,18 @@ export default function MatchesTab({
 
       if (scheduleError) throw scheduleError;
 
-      toast.success("🤝 Deal! Jadwal resmi disepakati.");
+      // 2. Panggil onUpdateStatus dari page.tsx (Fitur Baru)
+      // Ini akan otomatis update tabel 'matches' DAN kirim email notifikasi
+      await onUpdateStatus(matchId, 'accepted', fullMatchData);
+
+      toast.success("🤝 Deal! Jadwal resmi disepakati & Email terkirim.");
       refreshData();
     } catch (err: any) {
       toast.error("Gagal mengonfirmasi: " + err.message);
     }
   };
 
-  // Tampilan jika data kosong
+  // Tampilan jika data kosong (Tetap Sama)
   if (!matches || matches.length === 0) {
     return (
       <div className="text-center py-24 bg-slate-50 rounded-[50px] border-2 border-dashed border-slate-100 flex flex-col items-center">
@@ -67,7 +65,6 @@ export default function MatchesTab({
     <div className="space-y-8 animate-in fade-in duration-700">
       {matches.map((m: any) => {
         const schedule = m.match_schedules?.[0];
-        // Logika penentu siapa yang berhak konfirmasi
         const isMyProposal = schedule?.last_proposed_by === uInfo.id;
         const isConfirmed = m.status === 'accepted';
         const isNegotiating = m.status === 'negotiating' || m.status === 'pending';
@@ -141,7 +138,8 @@ export default function MatchesTab({
               {isNegotiating && !isMyProposal && (
                 <div className="flex gap-3">
                   <button 
-                    onClick={() => handleFinalAccept(m.id)} 
+                    // Kita oper 'm' (data match lengkap) agar API email punya info yang cukup
+                    onClick={() => handleFinalAccept(m.id, m)} 
                     className="bg-emerald-500 text-white text-[10px] font-black uppercase px-8 py-4 rounded-2xl shadow-xl shadow-emerald-100 hover:bg-emerald-600 transition-all flex items-center gap-2"
                   >
                     Konfirmasi <CheckCircle2 size={14} />

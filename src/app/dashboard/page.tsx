@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 
 // ================= KOMPONEN UTAMA =================
 import Navbar from '@/components/dashboard/Navbar';
-import AdminTab from '@/components/dashboard/AdminTab'; // Tab Utama Admin
+import AdminTab from '@/components/dashboard/AdminTab'; 
 import CatalogTab from '@/components/dashboard/CatalogTab';
 import MatchesTab from '@/components/dashboard/MatchesTab';
 import IdeaForm from '@/components/dashboard/IdeaForm';
@@ -41,6 +41,7 @@ export default function DashboardPage() {
       const matchQueryString = `
         *, 
         investor:profiles!matches_investor_id_fkey(email),
+        founder:profiles!matches_founder_id_fkey(email),
         creative_ideas(startup_name, founder_name), 
         match_schedules(*)
       `;
@@ -102,11 +103,50 @@ export default function DashboardPage() {
     initSession();
   }, [router, fetchData]);
 
-  // 4. HANDLERS (Jembatan ke AdminTab & CatalogTab)
+  // ================= 4. HANDLERS (UPDATE STATUS & EMAIL) =================
+  
+  const handleStatusUpdate = async (matchId: string, newStatus: string, matchData: any) => {
+    try {
+      // 1. Update Database
+      const { error } = await supabase
+        .from('matches')
+        .update({ status: newStatus })
+        .eq('id', matchId);
+
+      if (error) throw error;
+
+      // 2. Trigger Email - Hanya jika statusnya 'accepted' (Deal)
+      if (newStatus === 'accepted') {
+        const schedule = matchData.match_schedules?.[0] || {};
+        
+        fetch('/api/send-match-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            investorEmail: matchData.investor?.email,
+            founderEmail: matchData.founder?.email || uInfo.email,
+            startupName: matchData.creative_ideas?.startup_name || 'Startup',
+            // Pastikan nama variabel ini sesuai dengan yang diterima di route.ts
+            date: schedule.meeting_date || 'TBA',
+            time: schedule.start_time || 'TBA',
+            table: schedule.table_number || 'TBA',
+          }),
+        }).catch(err => console.error("Email Error:", err));
+
+        toast.success('🤝 Deal! Notifikasi email terkirim ke kedua pihak.');
+      } else {
+        toast.success(`Status diperbarui ke: ${newStatus}`);
+      }
+
+      fetchData(uInfo.id, uInfo.role); 
+    } catch (err: any) {
+      toast.error('Gagal update status: ' + err.message);
+    }
+  };
+
   const handleEditIdea = (idea: any) => {
     setEditingIdea(idea);
     setShowForm(true);
-    // Scroll ke atas biar form-nya keliatan
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -132,11 +172,9 @@ export default function DashboardPage() {
   }
 
   return (
-    // Penambahan class flex dan flex-col di sini
     <div className="min-h-screen bg-[#FDFDFD] flex flex-col">
       <Navbar email={uInfo.email} />
       
-      {/* Penambahan class w-full dan flex-grow di sini */}
       <main className="max-w-6xl mx-auto w-full px-6 py-12 flex-grow">
         <header className="flex justify-between items-end mb-12">
           <div>
@@ -145,7 +183,6 @@ export default function DashboardPage() {
               Status Akses: <span className={`px-2 py-0.5 rounded-md ${uInfo.role === 'admin' ? 'bg-red-50 text-red-500' : 'bg-indigo-50 text-indigo-600'}`}>{uInfo.role}</span>
             </p>
           </div>
-        {/* Tombol HANYA muncul untuk role founder, Admin pakai tombol di dalam Catalog Master */}
         {uInfo.role === 'founder' && (
           <button 
             onClick={() => { setShowForm(!showForm); setEditingIdea(null); }} 
@@ -183,7 +220,8 @@ export default function DashboardPage() {
               matches={matches} 
               users={users} 
               refreshData={() => fetchData(uInfo.id, uInfo.role)}
-              onEditIdea={handleEditIdea} // <--- INI KUNCINYA BRE!
+              onEditIdea={handleEditIdea}
+              onUpdateStatus={handleStatusUpdate}
             />
           )}
 
@@ -204,12 +242,12 @@ export default function DashboardPage() {
               uInfo={uInfo} 
               refreshData={() => fetchData(uInfo.id, uInfo.role)}
               onReschedule={handleReschedule}
+              onUpdateStatus={handleStatusUpdate}
             />
           )}
         </div>
       </main>
 
-      {/* PANGGIL FOOTER DI SINI */}
       <Footer />
 
       {/* ================= MODALS ================= */}

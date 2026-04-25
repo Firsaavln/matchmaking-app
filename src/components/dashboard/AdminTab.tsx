@@ -7,9 +7,22 @@ import AdminCatalog from '@/components/admin/AdminCatalog';
 import AdminSchedules from '@/components/admin/AdminSchedules';
 import AdminUsers from '@/components/admin/AdminUsers';
 
-export default function AdminTab(props: any) {
+// Kita definisikan interface-nya biar TypeScript gak rewel
+interface AdminTabProps {
+  ideas: any[];
+  matches: any[];
+  users: any[];
+  refreshData: () => void;
+  onEditIdea: (idea: any) => void;
+  onUpdateStatus: (matchId: string, newStatus: string, matchData: any) => void; // <--- KUNCI BIAR GAK MERAH
+}
+
+export default function AdminTab({ onUpdateStatus, ...props }: AdminTabProps | any) {
   const [subTab, setSubTab] = useState<'insights' | 'users' | 'schedules' | 'catalog'>('insights');
-  const confirmedMatches = props.matches.filter((m: any) => m.status === 'accepted');
+  
+  // Ambil data matches dari props
+  const matches = props.matches || [];
+  const confirmedMatches = matches.filter((m: any) => m.status === 'accepted');
 
   return (
     <div className="animate-in fade-in duration-500 space-y-8 pb-20">
@@ -18,14 +31,24 @@ export default function AdminTab(props: any) {
         <TabButton active={subTab === 'insights'} onClick={() => setSubTab('insights')} icon={<BarChart3 size={14}/>} label="Insights" />
         <TabButton active={subTab === 'catalog'} onClick={() => setSubTab('catalog')} icon={<Briefcase size={14}/>} label={`Catalogs (${props.ideas?.length || 0})`} />
         <TabButton active={subTab === 'schedules'} onClick={() => setSubTab('schedules')} icon={<CheckCircle size={14}/>} label={`Schedules (${confirmedMatches.length})`} />
-        <TabButton active={subTab === 'users'} onClick={() => setSubTab('users')} icon={<UsersIcon size={14}/>} label={`Users (${props.users.length})`} />
+        <TabButton active={subTab === 'users'} onClick={() => setSubTab('users')} icon={<UsersIcon size={14}/>} label={`Users (${props.users?.length || 0})`} />
       </div>
 
       {/* RENDER COMPONENTS */}
-      {subTab === 'insights' && <AdminInsights {...props} />}
-      {subTab === 'catalog' && <AdminCatalog {...props} />}
-      {subTab === 'schedules' && <AdminSchedules confirmedMatches={confirmedMatches} {...props} />}
-      {subTab === 'users' && <AdminUsers {...props} />}
+      {/* Kita oper onUpdateStatus ke semua sub-komponen lewat {...props} */}
+      {subTab === 'insights' && <AdminInsights onUpdateStatus={onUpdateStatus} {...props} />}
+      
+      {subTab === 'catalog' && <AdminCatalog onUpdateStatus={onUpdateStatus} {...props} />}
+      
+      {subTab === 'schedules' && (
+        <AdminSchedules 
+          confirmedMatches={confirmedMatches} 
+          onUpdateStatus={onUpdateStatus} 
+          {...props} 
+        />
+      )}
+      
+      {subTab === 'users' && <AdminUsers onUpdateStatus={onUpdateStatus} {...props} />}
     </div>
   );
 }
