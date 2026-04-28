@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
-import { Loader2 } from 'lucide-react';
+import { Loader2, PieChart } from 'lucide-react';
 import { toast } from 'sonner';
 
 // ================= KOMPONEN UTAMA =================
@@ -15,6 +15,7 @@ import IdeaForm from '@/components/dashboard/IdeaForm';
 import DetailModal from '@/components/modals/DetailModal';
 import ScheduleModal from '@/components/modals/ScheduleModal';
 import Footer from '@/components/dashboard/Footer';
+import InsightsTab from '@/components/dashboard/InsightsTab';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -22,11 +23,19 @@ export default function DashboardPage() {
   // 1. STATE MANAGEMENT
   const [loading, setLoading] = useState(true);
   const [uInfo, setUInfo] = useState({ id: '', email: '', role: '' });
-  const [activeTab, setActiveTab] = useState<'catalog' | 'matches' | 'admin'>('catalog');
+  
+  const [activeTab, setActiveTab] = useState<'catalog' | 'matches' | 'admin' | 'insights'>('insights');
   
   const [ideas, setIdeas] = useState<any[]>([]);
   const [matches, setMatches] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
+
+  // STATE UNTUK DATA GLOBAL (DIBUTUHKAN OLEH INSIGHTS TAB)
+  const [globalData, setGlobalData] = useState<{ ideas: any[], matches: any[], profiles: any[] }>({ 
+    ideas: [], 
+    matches: [], 
+    profiles: [] 
+  });
 
   const [showForm, setShowForm] = useState(false);
   const [editingIdea, setEditingIdea] = useState<any | null>(null);
@@ -38,10 +47,24 @@ export default function DashboardPage() {
   // 2. FETCH DATA (Kunci Utama Sinkronisasi)
   const fetchData = useCallback(async (uid: string, role: string) => {
     try {
+      // 1. AMBIL DATA GLOBAL UNTUK STATISTIK / INSIGHTS (Pakai select('*') biar aman dari beda nama kolom)
+      const [gIdeas, gMatches, gProfiles] = await Promise.all([
+        supabase.from('creative_ideas').select('*'),
+        supabase.from('matches').select('status'),
+        supabase.from('profiles').select('role')
+      ]);
+      
+      setGlobalData({ 
+        ideas: gIdeas.data || [], 
+        matches: gMatches.data || [], 
+        profiles: gProfiles.data || [] 
+      });
+
+      // 2. AMBIL DATA SPESIFIK UNTUK TAB MATCHES & CATALOG
       const matchQueryString = `
         *, 
-        investor:profiles!matches_investor_id_fkey(email),
-        founder:profiles!matches_founder_id_fkey(email),
+        investor:profiles!matches_investor_id_fkey(email, phone_number),
+        founder:profiles!matches_founder_id_fkey(email, phone_number),
         creative_ideas(startup_name, founder_name), 
         match_schedules(*)
       `;
@@ -92,6 +115,8 @@ export default function DashboardPage() {
 
         const role = profile.role || 'founder';
         setUInfo({ id: user.id, email: user.email!, role: role });
+        
+        // Admin default ke admin tab, selain itu ke insights
         if (role === 'admin') setActiveTab('admin');
         await fetchData(user.id, role);
       } catch (err) {
@@ -107,7 +132,6 @@ export default function DashboardPage() {
   
   const handleStatusUpdate = async (matchId: string, newStatus: string, matchData: any) => {
     try {
-      // 1. Update Database
       const { error } = await supabase
         .from('matches')
         .update({ status: newStatus })
@@ -115,25 +139,32 @@ export default function DashboardPage() {
 
       if (error) throw error;
 
-      // 2. Trigger Email - Hanya jika statusnya 'accepted' (Deal)
       if (newStatus === 'accepted') {
         const schedule = matchData.match_schedules?.[0] || {};
         
+        console.log("Cek Payload ke Backend:", {
+          matchId: matchId,
+          investorPhone: matchData.investor?.phone_number,
+          founderPhone: matchData.founder?.phone_number
+        });
+
         fetch('/api/send-match-email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            matchId: matchId,
             investorEmail: matchData.investor?.email,
             founderEmail: matchData.founder?.email || uInfo.email,
+            investorPhone: matchData.investor?.phone_number || 'TBA', 
+            founderPhone: matchData.founder?.phone_number || 'TBA',   
             startupName: matchData.creative_ideas?.startup_name || 'Startup',
-            // Pastikan nama variabel ini sesuai dengan yang diterima di route.ts
             date: schedule.meeting_date || 'TBA',
             time: schedule.start_time || 'TBA',
             table: schedule.table_number || 'TBA',
           }),
-        }).catch(err => console.error("Email Error:", err));
+        }).catch(err => console.error("Email/WA Error:", err));
 
-        toast.success('🤝 Deal! Notifikasi email terkirim ke kedua pihak.');
+        toast.success('🤝 Deal! Notifikasi email & WA terkirim ke kedua pihak.');
       } else {
         toast.success(`Status diperbarui ke: ${newStatus}`);
       }
@@ -198,7 +229,13 @@ export default function DashboardPage() {
           {uInfo.role === 'admin' && (
             <button onClick={() => setActiveTab('admin')} className={`pb-4 text-[10px] font-black uppercase whitespace-nowrap transition-all ${activeTab === 'admin' ? 'border-b-4 border-slate-900 text-slate-900' : 'text-slate-300'}`}>Admin Center</button>
           )}
+          
+          <button onClick={() => setActiveTab('insights')} className={`pb-4 text-[10px] font-black flex items-center gap-2 uppercase whitespace-nowrap transition-all ${activeTab === 'insights' ? 'border-b-4 border-indigo-600 text-indigo-600' : 'text-slate-300'}`}>
+            <PieChart size={14} /> Market Insights
+          </button>
+
           <button onClick={() => setActiveTab('catalog')} className={`pb-4 text-[10px] font-black uppercase whitespace-nowrap transition-all ${activeTab === 'catalog' ? 'border-b-4 border-slate-900 text-slate-900' : 'text-slate-300'}`}>Startup Catalog</button>
+          
           <button onClick={() => setActiveTab('matches')} className={`pb-4 text-[10px] font-black uppercase whitespace-nowrap transition-all ${activeTab === 'matches' ? 'border-b-4 border-slate-900 text-slate-900' : 'text-slate-300'}`}>Matches ({matches.length})</button>
         </div>
 
@@ -214,6 +251,12 @@ export default function DashboardPage() {
         
         {/* TAB CONTENTS RENDERING */}
         <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+          
+          {/* TAB INSIGHTS UNTUK SEMUA ROLE */}
+          {activeTab === 'insights' && (
+            <InsightsTab data={globalData} />
+          )}
+
           {activeTab === 'admin' && uInfo.role === 'admin' && (
             <AdminTab 
               ideas={ideas} 

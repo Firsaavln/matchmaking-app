@@ -4,12 +4,13 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import Image from 'next/image'; // 1. Tambah import Image
+import Image from 'next/image';
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [phone, setPhone] = useState(''); // <-- TAMBAHAN: State untuk nomor WA
   const [role, setRole] = useState('founder');
   const [loading, setLoading] = useState(true);
   const [authLoading, setAuthLoading] = useState(false);
@@ -35,8 +36,14 @@ export default function AuthPage() {
       if (!isLogin) {
         // REGISTER LOGIC
         const { error } = await supabase.auth.signUp({
-          email, password,
-          options: { data: { role } }
+          email, 
+          password,
+          options: { 
+            data: { 
+              role,
+              phone_number: phone // <-- TAMBAHAN: Simpan nomor WA ke database
+            } 
+          }
         });
         if (error) throw error;
         toast.success("Account created. Check your email or try signing in.");
@@ -143,6 +150,22 @@ export default function AuthPage() {
                   onChange={(e) => setEmail(e.target.value)} 
                 />
               </div>
+
+              {/* <-- TAMBAHAN: INPUT WA KHUSUS SAAT REGISTER SAJA --> */}
+              {!isLogin && (
+                <div className="group animate-in fade-in slide-in-from-top-2 duration-500">
+                  <label className="text-[9px] font-black uppercase text-slate-400 tracking-widest mb-2 block group-focus-within:text-slate-900 transition-all">WhatsApp Number</label>
+                  <input 
+                    required={!isLogin}
+                    type="tel" 
+                    placeholder="628123456xxxx"
+                    className="w-full border-b-2 border-slate-100 py-2 focus:border-slate-900 outline-none text-sm font-semibold transition-all placeholder:text-slate-200"
+                    value={phone} 
+                    onChange={(e) => setPhone(e.target.value)} 
+                  />
+                  <p className="text-[9px] text-slate-400 mt-2 font-medium">Gunakan format 62 atau 08 (cth: 62812...)</p>
+                </div>
+              )}
 
               <div className="group">
                 <label className="text-[9px] font-black uppercase text-slate-400 tracking-widest mb-2 block group-focus-within:text-slate-900 transition-all">Secure Password</label>
