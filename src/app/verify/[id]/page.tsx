@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useParams } from 'next/navigation';
-import Image from 'next/image';
+// import Image from 'next/image';
 import { Loader2, MapPin, Calendar, Clock, AlertTriangle } from 'lucide-react';
 
 export default function VerifyPage() {
@@ -111,7 +111,7 @@ export default function VerifyPage() {
           <div className="text-center p-6 border-2 border-dashed border-slate-200 rounded-[32px] bg-white">
             <p className="text-[10px] font-black text-slate-900 uppercase tracking-widest mb-4">Scan for Check-in</p>
             <div className="inline-block p-2 bg-white rounded-2xl border border-slate-100">
-              <Image src={qrUrl} alt="QR Pass" width={200} height={200} className="rounded-lg" />
+              <img src={qrUrl} alt="QR Pass" width={200} height={200} className="rounded-lg" />
             </div>
           </div>
         </div>
