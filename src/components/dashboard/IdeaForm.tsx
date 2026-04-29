@@ -26,7 +26,7 @@ export default function IdeaForm({ uInfo, editingIdea, onSuccess, onCancel }: { 
     location: '',
     phone_number: '', 
     core_advantages: '', 
-    target_market: '',
+    target_market: '', // Diubah dari input text jadi dropdown di bawah
     key_metrics: '', 
     event_goals: '', 
     description: ''
@@ -162,7 +162,7 @@ export default function IdeaForm({ uInfo, editingIdea, onSuccess, onCancel }: { 
               <div>
                 <p className="text-[9px] font-black uppercase text-slate-400 mb-1 ml-1">Kategori Bisnis</p>
                 <select required className="w-full bg-slate-50 border-2 border-transparent focus:border-slate-200 focus:bg-white p-4 rounded-2xl text-sm font-bold outline-none cursor-pointer" value={formData.business_category} onChange={e => setFormData({...formData, business_category: e.target.value})}>
-                  <option value="">Pilih Kategori</option>
+                  <option value="" disabled>Pilih Kategori</option>
                   {BUSINESS_CATEGORIES.map(b => <option key={b} value={b}>{b}</option>)}
                 </select>
               </div>
@@ -174,8 +174,20 @@ export default function IdeaForm({ uInfo, editingIdea, onSuccess, onCancel }: { 
                 </div>
               </div>
               <div>
-                <p className="text-[9px] font-black uppercase text-slate-400 mb-1 ml-1">Target Market</p>
-                <input required placeholder="Siapa target user Anda?" className="w-full bg-slate-50 border-2 border-transparent focus:border-slate-200 focus:bg-white p-4 rounded-2xl text-sm font-bold outline-none" value={formData.target_market} onChange={e => setFormData({...formData, target_market: e.target.value})} />
+                {/* DROP DOWN TARGET MARKET (PENGGANTI INPUT TEKS BEBAS) */}
+                <p className="text-[9px] font-black uppercase text-slate-400 mb-1 ml-1">Target Market Utama</p>
+                <select 
+                  required 
+                  className="w-full bg-slate-50 border-2 border-transparent focus:border-slate-200 focus:bg-white p-4 rounded-2xl text-sm font-bold outline-none cursor-pointer" 
+                  value={formData.target_market} 
+                  onChange={e => setFormData({...formData, target_market: e.target.value})}
+                >
+                  <option value="" disabled>Pilih Target Market</option>
+                  <option value="B2B">B2B (Business to Business)</option>
+                  <option value="B2C">B2C (Business to Consumer)</option>
+                  <option value="B2G">B2G (Business to Government)</option>
+                  <option value="C2C">C2C (Consumer to Consumer)</option>
+                </select>
               </div>
               <div>
                 <p className="text-[9px] font-black uppercase text-slate-400 mb-1 ml-1">Target Event</p>

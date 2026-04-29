@@ -14,15 +14,21 @@ import MatchesTab from '@/components/dashboard/MatchesTab';
 import IdeaForm from '@/components/dashboard/IdeaForm';
 import DetailModal from '@/components/modals/DetailModal';
 import ScheduleModal from '@/components/modals/ScheduleModal';
+import ProfileModal from '@/components/modals/ProfileModal'; // <-- IMPORT BARU: Profile Modal
 import Footer from '@/components/dashboard/Footer';
 import InsightsTab from '@/components/dashboard/InsightsTab';
 
 export default function DashboardPage() {
   const router = useRouter();
   
-  // 1. STATE MANAGEMENT
+  // 1. STATE MANAGEMENT (DITAMBAHKAN STATE PREFERENCES UNTUK ALGORITMA)
   const [loading, setLoading] = useState(true);
-  const [uInfo, setUInfo] = useState({ id: '', email: '', role: '' });
+  const [uInfo, setUInfo] = useState({ 
+    id: '', 
+    email: '', 
+    role: '',
+    preferences: null as any
+  });
   
   const [activeTab, setActiveTab] = useState<'catalog' | 'matches' | 'admin' | 'insights'>('insights');
   
@@ -42,6 +48,7 @@ export default function DashboardPage() {
   const [selectedIdea, setSelectedIdea] = useState<any | null>(null);
   const [selectedMatch, setSelectedMatch] = useState<any | null>(null);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false); // <-- STATE BARU: Profile Modal
   const [matchType, setMatchType] = useState<'new_request' | 'reschedule'>('new_request');
 
   // 2. FETCH DATA (Kunci Utama Sinkronisasi)
@@ -114,7 +121,17 @@ export default function DashboardPage() {
         }
 
         const role = profile.role || 'founder';
-        setUInfo({ id: user.id, email: user.email!, role: role });
+        
+        setUInfo({ 
+          id: user.id, 
+          email: user.email!, 
+          role: role,
+          preferences: {
+            sectors: profile.interested_sectors || [],
+            markets: profile.target_market_pref || [],
+            stage: profile.preferred_stage || 'Early'
+          }
+        });
         
         // Admin default ke admin tab, selain itu ke insights
         if (role === 'admin') setActiveTab('admin');
@@ -214,14 +231,28 @@ export default function DashboardPage() {
               Status Akses: <span className={`px-2 py-0.5 rounded-md ${uInfo.role === 'admin' ? 'bg-red-50 text-red-500' : 'bg-indigo-50 text-indigo-600'}`}>{uInfo.role}</span>
             </p>
           </div>
-        {uInfo.role === 'founder' && (
-          <button 
-            onClick={() => { setShowForm(!showForm); setEditingIdea(null); }} 
-            className="bg-slate-900 text-white text-[11px] font-black uppercase px-8 py-4 rounded-2xl shadow-xl hover:bg-indigo-600 active:scale-95 transition-all"
-          >
-            {showForm ? 'Batal' : 'Tambah Katalog'}
-          </button>
-        )}
+          
+          {/* WRAPPER TOMBOL (FOUDER & INVESTOR) */}
+          <div className="flex gap-3">
+            {uInfo.role === 'founder' && (
+              <button 
+                onClick={() => { setShowForm(!showForm); setEditingIdea(null); }} 
+                className="bg-slate-900 text-white text-[11px] font-black uppercase px-8 py-4 rounded-2xl shadow-xl hover:bg-indigo-600 active:scale-95 transition-all"
+              >
+                {showForm ? 'Batal' : 'Tambah Katalog'}
+              </button>
+            )}
+            
+            {/* <-- TOMBOL INVESTOR BARU DISINI --> */}
+            {uInfo.role === 'investor' && (
+              <button 
+                onClick={() => setShowProfileModal(true)} 
+                className="bg-indigo-600 text-white text-[11px] font-black uppercase px-8 py-4 rounded-2xl shadow-xl hover:bg-indigo-700 active:scale-95 transition-all flex items-center gap-2"
+              >
+                Atur Preferensi Match
+              </button>
+            )}
+          </div>
         </header>
 
         {/* TAB SWITCHER */}
@@ -303,6 +334,18 @@ export default function DashboardPage() {
           uInfo={uInfo} type={matchType} idea={selectedIdea} match={selectedMatch}
           onClose={() => { setShowScheduleModal(false); setSelectedIdea(null); setSelectedMatch(null); }}
           onSuccess={() => { setShowScheduleModal(false); setSelectedIdea(null); setSelectedMatch(null); fetchData(uInfo.id, uInfo.role); }}
+        />
+      )}
+
+      {/* <-- MODAL PREFERENSI INVESTOR BARU DISINI --> */}
+      {showProfileModal && (
+        <ProfileModal 
+          uInfo={uInfo}
+          onClose={() => setShowProfileModal(false)}
+          onSuccess={() => {
+            setShowProfileModal(false);
+            window.location.reload(); 
+          }}
         />
       )}
     </div>
