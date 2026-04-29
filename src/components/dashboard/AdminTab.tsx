@@ -61,7 +61,8 @@ export default function AdminTab({ onUpdateStatus, onReschedule, ...props }: Adm
         <TabButton active={subTab === 'schedules'} onClick={() => setSubTab('schedules')} icon={<CheckCircle size={14}/>} label={`Schedules (${confirmedMatches.length})`} />
         <TabButton active={subTab === 'users'} onClick={() => setSubTab('users')} icon={<UsersIcon size={14}/>} label={`Users (${props.users?.length || 0})`} />
         
-        <div className="w-[1px] bg-slate-200 mx-2 my-2"></div>
+        {/* Garis pemisah disembunyikan di mobile biar ga aneh */}
+        <div className="hidden md:block w-[1px] bg-slate-200 mx-2 my-2"></div>
         <button 
           onClick={() => setSubTab('automatch')} 
           className={`flex items-center gap-2 px-6 py-3 text-[10px] font-black uppercase rounded-2xl transition-all ${subTab === 'automatch' ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-200' : 'text-indigo-600 bg-indigo-50 hover:bg-indigo-100'}`}
@@ -197,7 +198,6 @@ function AdminAutoMatch({ ideas, users, matches }: { ideas: any[], users: any[],
 
       toast.success(`Jadwal dibuat!`, { id: toastId });
       
-      // HARD REFRESH BROWSER (DIJAMIN 1000% UPDATE DI LAYAR)
       setTimeout(() => {
         window.location.reload();
       }, 500);
@@ -209,9 +209,11 @@ function AdminAutoMatch({ ideas, users, matches }: { ideas: any[], users: any[],
   };
 
   return (
-    <div className="bg-white border border-slate-100 rounded-[35px] p-8 md:p-12 shadow-sm animate-in zoom-in-95 duration-500">
-      <div className="flex items-center gap-4 mb-8 border-b border-slate-100 pb-8">
-        <div className="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-3xl flex items-center justify-center">
+    <div className="bg-white border border-slate-100 rounded-[35px] p-6 md:p-12 shadow-sm animate-in zoom-in-95 duration-500">
+      
+      {/* HEADER RESPONSIVE */}
+      <div className="flex flex-col md:flex-row items-center text-center md:text-left gap-4 mb-8 border-b border-slate-100 pb-8">
+        <div className="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-3xl flex items-center justify-center shrink-0">
           <Zap size={32} />
         </div>
         <div>
@@ -228,19 +230,21 @@ function AdminAutoMatch({ ideas, users, matches }: { ideas: any[], users: any[],
       ) : (
         <div className="space-y-8">
           {generatedList.map((data, index) => (
-            <div key={index} className="bg-slate-50 border border-slate-200 p-6 rounded-[24px]">
+            <div key={index} className="bg-slate-50 border border-slate-200 p-5 md:p-6 rounded-[24px]">
               
-              <div className="flex justify-between items-center mb-6 border-b border-slate-200 pb-4">
-                <div>
+              {/* INVESTOR INFO RESPONSIVE */}
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 mb-6 border-b border-slate-200 pb-4">
+                <div className="w-full md:w-auto overflow-hidden">
                   <p className="text-[9px] font-black uppercase tracking-widest text-indigo-500 mb-1">Rekomendasi Untuk:</p>
-                  <h3 className="text-lg font-black text-slate-900">{data.investor.email}</h3>
+                  <h3 className="text-lg font-black text-slate-900 truncate w-full">{data.investor.email}</h3>
                 </div>
-                <div className="bg-indigo-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-md shadow-indigo-200">
+                <div className="bg-indigo-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider shadow-md shadow-indigo-200 self-start md:self-auto shrink-0">
                   {data.suggestions.length} Match Found
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* GRID KARTU STARTUP */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {data.suggestions.map((idea, i) => (
                   <div key={i} className="bg-white p-5 rounded-[20px] border border-slate-100 shadow-sm relative overflow-hidden flex flex-col justify-between">
                     
@@ -249,25 +253,26 @@ function AdminAutoMatch({ ideas, users, matches }: { ideas: any[], users: any[],
                         🔥 {idea.score}%
                       </div>
                       
-                      <div className="flex items-center gap-4 mb-3 mt-1 text-slate-400">
+                      {/* JAM & MEJA RESPONSIVE */}
+                      <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-3 mt-1 text-slate-400">
                         <div className="flex items-center gap-1.5">
                           <Clock size={14} className="text-indigo-500" />
-                          <span className="text-[11px] font-black uppercase tracking-wider text-slate-700">{idea.suggestedTime}</span>
+                          <span className="text-[10px] md:text-[11px] font-black uppercase tracking-wider text-slate-700">{idea.suggestedTime}</span>
                         </div>
                         <div className="flex items-center gap-1.5">
                           <MapPin size={14} className="text-emerald-500" />
-                          <span className="text-[11px] font-black uppercase tracking-wider text-slate-700">Meja {idea.suggestedTable}</span>
+                          <span className="text-[10px] md:text-[11px] font-black uppercase tracking-wider text-slate-700">Meja {idea.suggestedTable}</span>
                         </div>
                       </div>
 
-                      <h4 className="font-black text-sm text-slate-900 leading-tight mb-1">{idea.startup_name}</h4>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest truncate mb-4">{idea.business_category} • {idea.target_market}</p>
+                      <h4 className="font-black text-sm text-slate-900 leading-tight mb-1 line-clamp-2">{idea.startup_name}</h4>
+                      <p className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest truncate mb-4">{idea.business_category} • {idea.target_market}</p>
                     </div>
 
                     <button 
                       onClick={() => handleConfirmMatch(data.investor, idea)}
                       disabled={isProcessing === idea.id}
-                      className="w-full bg-slate-900 text-white text-[10px] font-black uppercase py-2.5 rounded-xl hover:bg-indigo-600 transition-all flex justify-center items-center gap-2 disabled:opacity-50"
+                      className="w-full bg-slate-900 text-white text-[10px] font-black uppercase py-3 md:py-2.5 rounded-xl hover:bg-indigo-600 transition-all flex justify-center items-center gap-2 disabled:opacity-50"
                     >
                       {isProcessing === idea.id ? <><Loader2 size={14} className="animate-spin" /> Memproses...</> : 'Konfirmasi Jadwal'}
                     </button>
