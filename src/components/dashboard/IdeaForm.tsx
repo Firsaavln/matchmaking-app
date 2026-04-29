@@ -34,9 +34,23 @@ export default function IdeaForm({ uInfo, editingIdea, onSuccess, onCancel }: { 
 
   useEffect(() => {
     if (editingIdea) {
+      // Kita "safeguard" semua field yang berpotensi null dari Supabase menjadi string kosong ''
       setFormData({ 
-        ...editingIdea, 
-        founding_year: editingIdea.founding_year?.toString() || new Date().getFullYear().toString() 
+        startup_name: editingIdea.startup_name || '', 
+        founder_name: editingIdea.founder_name || '', 
+        title: editingIdea.title || '', 
+        tagline: editingIdea.tagline || '', 
+        social_link: editingIdea.social_link || '', 
+        founding_year: editingIdea.founding_year?.toString() || new Date().getFullYear().toString(),
+        business_category: editingIdea.business_category || '', 
+        company_type: editingIdea.company_type || 'PT', 
+        location: editingIdea.location || '',
+        phone_number: editingIdea.phone_number || '', 
+        core_advantages: editingIdea.core_advantages || '', 
+        target_market: editingIdea.target_market || '',
+        key_metrics: editingIdea.key_metrics || '', 
+        event_goals: editingIdea.event_goals || '', 
+        description: editingIdea.description || ''
       });
     }
   }, [editingIdea]);
